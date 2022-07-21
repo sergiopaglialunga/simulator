@@ -112,8 +112,8 @@ class Bootcamp(Centre):
 # Can train 200 trainees but only teaches one course per centre
 # when I open this kind of centre I will randomly assign a kind of course
 class TechCentre(Centre):
-    def __init__(self, condition, month):
-        self.course = {}
+    def __init__(self, condition, month, course_key):
+        self.course = {course_key:""}
         self.condition = condition
         self.month = month
         self.kind = "Tech Centre"
@@ -169,6 +169,7 @@ while num <= user_months:
         # check if less than 2 bootcamps are open
         center_type = random.choice("Training Hub", "Bootcamp", "Tech Centre")
         if center_type == "Bootcamp":
+            # check the number of Bootcamps opened, and if less than 2 open one
             count = 0
             for i in range(0,len(centres)-1):
                 if centres[i].type == "Bootcamp" and centres[i].condition == "open":
@@ -176,7 +177,24 @@ while num <= user_months:
             if count < 2:
                 centres.append(Bootcamp("open", num))
             # else choose between Training Hub or Tech Centre
-
+            else:
+                center_type = random.choice("Training Hub", "Tech Centre")
+                if center_type == "Training Hub":
+                # check the number of Training Hubs opened, and if less than 3 open one
+                    count = 0
+                    for i in range(0, len(centres) - 1):
+                        if centres[i].type == "Training Hub" and centres[i].condition == "open":
+                            count += 1
+                    if count < 3:
+                        centres.append(TrainingHub("open", num))
+                    else:
+                        # open a Tech Centre and assign a random course to the centre
+                        course = random.choice("Java", "C#", "Data", "DevOps", "Business")
+                        centres.append(TechCentre("open", num, course))
+                else:
+                    # open a Tech Centre and assign a random course to the centre
+                    course = random.choice("Java", "C#", "Data", "DevOps", "Business")
+                    centres.append(TechCentre("open", num, course))
 
         elif center_type == "Training Hub":
             count = 0
@@ -185,7 +203,14 @@ while num <= user_months:
                     count += 1
             if count < 3:
                 centres.append(TrainingHub("open", num))
-
+            else:
+                # open a Tech Centre and assign a random course to the centre
+                course = random.choice("Java", "C#", "Data", "DevOps", "Business")
+                centres.append(TechCentre("open", num, course))
+        else:
+            # open a Tech Centre and assign a random course to the centre
+            course = random.choice("Java", "C#", "Data", "DevOps", "Business")
+            centres.append(TechCentre("open", num, course))
 
 
     # 1) increase the month value for the trainees doing training

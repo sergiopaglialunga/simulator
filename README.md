@@ -1,4 +1,4 @@
-#Requirements
+# Requirements:
 
 - The tracker needs to be able to track time in a consistent way
 - The program starts by asking how long the simulation will run for
