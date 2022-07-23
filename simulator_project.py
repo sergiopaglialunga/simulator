@@ -4,6 +4,9 @@ from random import randrange
 trainees = []
 clients = []
 centres = []
+courses_list = ["Java", "C#", "Data", "DevOps", "Business"]
+close_TH = 0
+
 
 # condition = training, waiting_list, client, bench
 class Trainee:
@@ -11,8 +14,8 @@ class Trainee:
         self.course = course
         self.condition = condition
         # every month this value will increase when the trainee is in condition == "training"
-
         self.month = 0
+
 
 # condition = open, full, closed
 class Centre:
@@ -33,7 +36,6 @@ class Centre:
                 # assign trainees to learning centres
                 for trainee in trainees:
                     if trainee.condition == "waiting_list":
-                        # NEXT: what happens if the center is a Tech Center that only teaches 1 course ??????????!!!!!
                         if centre.kind == "Tech Center" and centre.course.key() == trainee.course:
                             trainee.condition = "training"
                             centre.course[trainee.course].append(trainee)
@@ -52,7 +54,7 @@ class Centre:
         # 12) close bootcamps with less than 25 trainees for 3 months
         if centre.kind == "Bootcamp" and centre.trainees < 25:
             centre.close_BC += 1
-            if centre.close_TH == 4:
+            if centre.close_BC == 4:
                 centre.condition = "closed"
                 # 14) move trainees to other centres
                 centre.move_trainees()
@@ -66,14 +68,14 @@ class Centre:
 
     def move_trainees(self):
         # 14) move trainees to waiting list
-        # iterate over the dictionary - trainee is a list containing the trainees studying in each course
-        for trainee in centre.course.values():
+        # iterate over the dictionary; list_trainees is a list containing the trainees studying in each course
+        for list_trainees in centre.course.values():
             # iterate over the items in the list containing the trainees studying in each course
             # t is each of the trainees
-            for t in len(trainee):
-                t.condition = "waiting_list"
-                # remove the trainee (t) from the list trainee
-                trainee.remove(t)
+            for trainee in list_trainees:
+                trainee.condition = "waiting_list"
+                # remove the trainee from the list list_trainees
+                list_trainees.remove(trainee)
 
 # can train a maximum of 100 trainees but 3 can be opened at a time each month
 class TrainingHub(Centre):
@@ -86,12 +88,11 @@ class TrainingHub(Centre):
         self.trainees = 0
         self.close_TH = 0
 
-        # MOVE TO A METHOD
-        n_trainees = 0
-        for t_list in self.trainees.values():
-            n_trainees += len(t_list)
-        if n_trainees >= 100:
+        for item in self.course.values():
+            self.trainees += len(item)
+        if self.trainees == 100:
             self.condition = "full"
+
 
 # can train a maximum of 500 trainees
 class Bootcamp(Centre):
@@ -100,39 +101,35 @@ class Bootcamp(Centre):
         self.condition = condition
         self.month = month
         self.kind = "Bootcamp"
-        self.trainees = 0
         self.capacity = 500
+        self.trainees = 0
+        self.close_BC = 0
 
-        n_trainees = 0
-        for t_list in self.trainees.values():
-            n_trainees += len(t_list)
-        if n_trainees >= 500:
+        for item in self.course.values():
+            self.trainees += len(item)
+        if self.trainees == 500:
             self.condition = "full"
+
 
 # Can train 200 trainees but only teaches one course per centre
 # when I open this kind of centre I will randomly assign a kind of course
 class TechCentre(Centre):
     def __init__(self, condition, month, course_key):
-        self.course = {course_key:""}
         self.condition = condition
         self.month = month
+        self.course = {course_key: []}
         self.kind = "Tech Centre"
-        self.trainees = 0
-        self.capacity = 100
+        self.capacity = 200
+        self.trainees = len(self.course[course_key])
 
-        n_trainees = 0
-        for t_list in self.trainees.values():
-            n_trainees += len(t_list)
-        if n_trainees >= 500:
+        if len(self.course[course_key]) == 200:
             self.condition = "full"
 
-
 class Clients:
-    def __init__(self, trainee_req, course, month):
+    def __init__(self, trainee_req, month, course_key):
         self.trainee_req = trainee_req
-        self.trainees_taken = []
-        self.course = course
         self.month = month
+        self.course = {course_key:""}
 
     def assign_trainees(self):
             # check if the client needs trainees
@@ -147,38 +144,47 @@ class Clients:
                                 client.trainees_taken.append(trainee)
                                 trainees_needed -= 1
 
-        def move_trainees(self):
+    def move_trainees(self):
+        for trainee in client.trainees_taken:
+            trainee.condition = "bench"
+
+    def unsatisfied_client(self):
+        if len(client.trainees_taken) < client.trainee_req and num - client.month == 12:
+            # move trainees to bench and delete client
             for trainee in client.trainees_taken:
                 trainee.condition = "bench"
-
-        def unsatisfied_client(self):
-            if len(client.trainees_taken) < client.trainee_req and num - client.month == 12:
-                # move trainees to bench and delete client
-                for trainee in client.trainees_taken:
-                    trainee.condition = "bench"
-                    clients.remove(client)
+                clients.remove(client)
 
 user_months = int(input(" Enter the number of months for the simulation:\n"))
 user_option = int(input(" For monthly results enter: 1\n For results at the end enter: 2 \n"))
 
 num = 1
 while num <= user_months:
-    # Every 2 months
+
+    # EVERY 12 MONTHS
+    if num % 12 == 0:
+        # Create a new client
+        # Generate the trainees requirement between 15 and 30 (randrange is not inclusive)
+        trainees_req = random.randrange(15, 31)
+        course = random.choice(courses_list)
+        clients.append(Clients(trainees_req, num, course))
+
+    # EVERY 2 MONTHS
     if num % 2 == 0:
         # 15) open 1 centre
         # check if less than 2 bootcamps are open
-        center_type = random.choice("Training Hub", "Bootcamp", "Tech Centre")
+        center_type = random.choice(["Training Hub", "Bootcamp", "Tech Centre"])
         if center_type == "Bootcamp":
             # check the number of Bootcamps opened, and if less than 2 open one
             count = 0
             for i in range(0,len(centres)-1):
-                if centres[i].type == "Bootcamp" and centres[i].condition == "open":
+                if centres[i].kind == "Bootcamp" and centres[i].condition == "open":
                     count += 1
             if count < 2:
                 centres.append(Bootcamp("open", num))
             # else choose between Training Hub or Tech Centre
             else:
-                center_type = random.choice("Training Hub", "Tech Centre")
+                center_type = random.choice(["Training Hub", "Tech Centre"])
                 if center_type == "Training Hub":
                 # check the number of Training Hubs opened, and if less than 3 open one
                     count = 0
@@ -189,30 +195,30 @@ while num <= user_months:
                         centres.append(TrainingHub("open", num))
                     else:
                         # open a Tech Centre and assign a random course to the centre
-                        course = random.choice("Java", "C#", "Data", "DevOps", "Business")
+                        course = random.choice(courses_list)
                         centres.append(TechCentre("open", num, course))
                 else:
                     # open a Tech Centre and assign a random course to the centre
-                    course = random.choice("Java", "C#", "Data", "DevOps", "Business")
+                    course = random.choice(courses_list)
                     centres.append(TechCentre("open", num, course))
 
         elif center_type == "Training Hub":
             count = 0
             for i in range(0,len(centres)-1):
-                if centres[i].type == "Training Hub" and centres[i].condition == "open":
+                if centres[i].kind == "Training Hub" and centres[i].condition == "open":
                     count += 1
             if count < 3:
                 centres.append(TrainingHub("open", num))
             else:
                 # open a Tech Centre and assign a random course to the centre
-                course = random.choice("Java", "C#", "Data", "DevOps", "Business")
+                course = random.choice(courses_list)
                 centres.append(TechCentre("open", num, course))
         else:
             # open a Tech Centre and assign a random course to the centre
-            course = random.choice("Java", "C#", "Data", "DevOps", "Business")
+            course = random.choice(courses_list)
             centres.append(TechCentre("open", num, course))
 
-
+    # EVERY MONTH
     # 1) increase the month value for the trainees doing training
     for trainee in trainees:
         if trainee.condition == "training":
@@ -230,12 +236,13 @@ while num <= user_months:
         client.unsatisfied_client()
 
     # 6) create 50 to 100 new trainees
-    num_trainees = random.randrange(50, 100)
+    num_trainees = random.randrange(50, 101)
     while num_trainees > 0:
         # 7) random assignment of trainee to courses
-        option = random.choice(["Java", "C#", "Data", "DevOps", "Business"])
-        # create a new trainee and append it to the trainees dictionary
-        trainees.append(Trainee(option, "waiting_list", num))
+        option = random.choice(courses_list)
+        # create a new trainee and append it to the trainees list
+        trainees.append(Trainee(option, "waiting_list"))
+        num_trainees -= 1
 
     # 8) each center takes 0 to 50 trainees
     for centre in centres:
@@ -248,9 +255,58 @@ while num <= user_months:
         # 14) move trainees to another centre
         centre.move_trainees()
 
+    if user_option == "1":
+        # show the number of open centres
+        open_centres = 0
+        for centre in centres:
+            if centre.condition == "open":
+                open_centres += 1
+        # show the number of full centres
+        full_centres = 0
+        for centre in centres:
+            if centre.condition == "full":
+                full_centres += 1
+        # show the number of trainees currently training
+        trainees_training = 0
+        for trainee in trainees:
+            if trainee.condition == "training":
+                trainees_training += 1
+        # show the number of trainees on the waiting list
+        trainees_waiting = 0
+        for trainee in trainees:
+            if trainee.condition == "waiting list":
+                trainees_waiting += 1
 
-
+        print(f"The number of open centres is: {open_centres}")
+        print(f"The number of full centres is: {full_centres}")
+        print(f"The number of trainees on training condition is: {trainees_training}")
+        print(f"The number of trainees on waiting list condition: {trainees_waiting}")
 
     num += 1
 
-print(Trainee)
+if user_option == "2":
+    # show the number of open centres
+    open_centres = 0
+    for centre in centres:
+        if centre.condition == "open":
+            open_centres += 1
+    # show the number of full centres
+    full_centres = 0
+    for centre in centres:
+        if centre.condition == "full":
+            full_centres += 1
+    # show the number of trainees currently training
+    trainees_training = 0
+    for trainee in trainees:
+        if trainee.condition == "training":
+            trainees_training += 1
+    # show the number of trainees on the waiting list
+    trainees_waiting = 0
+    for trainee in trainees:
+        if trainee.condition == "waiting list":
+            trainees_waiting += 1
+
+    print(f"The number of open centres is: {open_centres}")
+    print(f"The number of full centres is: {full_centres}")
+    print(f"The number of trainees on training condition is: {trainees_training}")
+    print(f"The number of trainees on waiting list condition: {trainees_waiting}")
