@@ -1,5 +1,4 @@
 import random
-from random import randrange
 
 trainees = []
 clients = []
@@ -8,7 +7,7 @@ courses_list = ["Java", "C#", "Data", "DevOps", "Business"]
 close_TH = 0
 
 
-# condition = training, waiting_list, client, bench
+# condition = "training", "waiting list", "client", "bench"
 class Trainee:
     def __init__(self, course, condition):
         self.course = course
@@ -35,13 +34,15 @@ class Centre:
             while rand >= 0:
                 # assign trainees to learning centres
                 for trainee in trainees:
-                    if trainee.condition == "waiting_list":
+                    if trainee.condition == "waiting list":
                         if centre.kind == "Tech Center" and centre.course.key() == trainee.course:
                             trainee.condition = "training"
                             centre.course[trainee.course].append(trainee)
-                        else:
+                            centre.trainees += 1
+                        elif centre.kind == "Bootcamp" or centre.kind == "Training Hub":
                             trainee.condition = "training"
                             centre.course[trainee.course].append(trainee)
+                            centre.trainees += 1
                         # 10) check if the centre is full after assigning trainees
                         if centre.trainees == centre.capacity:
                             centre.condition = "full"
@@ -73,7 +74,7 @@ class Centre:
             # iterate over the items in the list containing the trainees studying in each course
             # t is each of the trainees
             for trainee in list_trainees:
-                trainee.condition = "waiting_list"
+                trainee.condition = "waiting list"
                 # remove the trainee from the list list_trainees
                 list_trainees.remove(trainee)
 
@@ -128,30 +129,28 @@ class TechCentre(Centre):
 class Clients:
     def __init__(self, trainee_req, month, course_key):
         self.trainee_req = trainee_req
+        self.trainees = []
         self.month = month
         self.course = {course_key:""}
 
     def assign_trainees(self):
-            # check if the client needs trainees
-            if len(client.trainees_taken) < client.trainee_req:
-                # calculate the number of trainees needed
-                trainees_needed = client.trainee_req - len(client.trainees_taken)
-                # assign trainees to existing clients
-                while trainees_needed > 0:
-                    for trainee in trainees:
-                        if trainee.condition == "bench":
-                            if trainee.course == client.course:
-                                client.trainees_taken.append(trainee)
-                                trainees_needed -= 1
-
-    def move_trainees(self):
-        for trainee in client.trainees_taken:
-            trainee.condition = "bench"
+        # check if the client needs trainees
+        if len(client.trainees) < client.trainee_req:
+            # calculate the number of trainees needed
+            trainees_needed = client.trainee_req - len(client.trainees)
+            # assign trainees to existing clients
+            while trainees_needed > 0:
+                for trainee in trainees:
+                    if trainee.condition == "bench" and trainee.course == client.course:
+                        trainee.condition = "client"
+                        client.trainees.append(trainee)
+                        trainees_needed -= 1
+                break
 
     def unsatisfied_client(self):
-        if len(client.trainees_taken) < client.trainee_req and num - client.month == 12:
+        if len(client.trainees) < client.trainee_req:
             # move trainees to bench and delete client
-            for trainee in client.trainees_taken:
+            for trainee in client.trainees:
                 trainee.condition = "bench"
                 clients.remove(client)
 
@@ -163,6 +162,9 @@ while num <= user_months:
 
     # EVERY 12 MONTHS
     if num % 12 == 0:
+        # 5) delete unsatisfied clients (didn't fulfill requirement within a year)
+        for client in clients:
+            client.unsatisfied_client()
         # Create a new client
         # Generate the trainees requirement between 15 and 30 (randrange is not inclusive)
         trainees_req = random.randrange(15, 31)
@@ -230,10 +232,6 @@ while num <= user_months:
     for client in clients:
         # check if the client needs trainees
         client.assign_trainees()
-        # 4) move trainees with unsatisfied client to bench before deleting the client
-        client.move_trainees()
-        # 5) delete unsatisfied clients (didn't fulfill requirement within a year)
-        client.unsatisfied_client()
 
     # 6) create 50 to 100 new trainees
     num_trainees = random.randrange(50, 101)
@@ -255,7 +253,7 @@ while num <= user_months:
         # 14) move trainees to another centre
         centre.move_trainees()
 
-    if user_option == "1":
+    if user_option == 1:
         # show the number of open centres
         open_centres = 0
         for centre in centres:
@@ -284,7 +282,7 @@ while num <= user_months:
 
     num += 1
 
-if user_option == "2":
+if user_option == 2:
     # show the number of open centres
     open_centres = 0
     for centre in centres:
