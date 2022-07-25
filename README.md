@@ -1,4 +1,8 @@
-# Requirements:
+# Assignment for the Sparta Global training bootcamp
+
+## The program is a simulator that will allow to forecast the expansion of the company around the world. 
+
+## First requirements:
 
 - The tracker needs to be able to track time in a consistent way
 - The program starts by asking how long the simulation will run for
@@ -27,8 +31,8 @@
     - number of full centres (breakdown for each type)
     - number of trainees currently training (breakdown for each type)
     - number of trainees on the waiting list (breakdown for each type)
--	Number of clients
--	Number of trainees on client assignment
+    - Number of clients
+    - Number of trainees on client assignment
 
 The trainee can be moved to another centre teaching the same course
 

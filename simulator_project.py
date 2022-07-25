@@ -35,7 +35,7 @@ class Centre:
                 # assign trainees to learning centres
                 for trainee in trainees:
                     if trainee.condition == "waiting list":
-                        if centre.kind == "Tech Center" and centre.course.key() == trainee.course:
+                        if centre.kind == "Tech Centre" and centre.course.key() == trainee.course:
                             trainee.condition = "training"
                             centre.course[trainee.course].append(trainee)
                             centre.trainees += 1
@@ -43,6 +43,8 @@ class Centre:
                             trainee.condition = "training"
                             centre.course[trainee.course].append(trainee)
                             centre.trainees += 1
+                        else:
+                            continue
                         # 10) check if the centre is full after assigning trainees
                         if centre.trainees == centre.capacity:
                             centre.condition = "full"
@@ -78,6 +80,7 @@ class Centre:
                 # remove the trainee from the list list_trainees
                 list_trainees.remove(trainee)
 
+
 # can train a maximum of 100 trainees but 3 can be opened at a time each month
 class TrainingHub(Centre):
     def __init__(self, condition, month):
@@ -88,11 +91,6 @@ class TrainingHub(Centre):
         self.capacity = 100
         self.trainees = 0
         self.close_TH = 0
-
-        for item in self.course.values():
-            self.trainees += len(item)
-        if self.trainees == 100:
-            self.condition = "full"
 
 
 # can train a maximum of 500 trainees
@@ -106,11 +104,6 @@ class Bootcamp(Centre):
         self.trainees = 0
         self.close_BC = 0
 
-        for item in self.course.values():
-            self.trainees += len(item)
-        if self.trainees == 500:
-            self.condition = "full"
-
 
 # Can train 200 trainees but only teaches one course per centre
 # when I open this kind of centre I will randomly assign a kind of course
@@ -123,8 +116,6 @@ class TechCentre(Centre):
         self.capacity = 200
         self.trainees = len(self.course[course_key])
 
-        if len(self.course[course_key]) == 200:
-            self.condition = "full"
 
 class Clients:
     def __init__(self, trainee_req, month, course_key):
@@ -153,6 +144,9 @@ class Clients:
             for trainee in client.trainees:
                 trainee.condition = "bench"
                 clients.remove(client)
+        # reset the original value of trainees required for satisfied clients
+        else:
+            client.trainee_req *= num/12
 
 user_months = int(input(" Enter the number of months for the simulation:\n"))
 user_option = int(input(" For monthly results enter: 1\n For results at the end enter: 2 \n"))
@@ -191,7 +185,7 @@ while num <= user_months:
                 # check the number of Training Hubs opened, and if less than 3 open one
                     count = 0
                     for i in range(0, len(centres) - 1):
-                        if centres[i].type == "Training Hub" and centres[i].condition == "open":
+                        if centres[i].kind == "Training Hub" and centres[i].condition == "open":
                             count += 1
                     if count < 3:
                         centres.append(TrainingHub("open", num))
@@ -256,55 +250,69 @@ while num <= user_months:
     if user_option == 1:
         # show the number of open centres
         open_centres = 0
+        full_centres = 0
+        closed_centres = 0
+
         for centre in centres:
             if centre.condition == "open":
                 open_centres += 1
-        # show the number of full centres
-        full_centres = 0
-        for centre in centres:
             if centre.condition == "full":
                 full_centres += 1
+            if centre.condition == "closed":
+                closed_centres += 1
+
         # show the number of trainees currently training
         trainees_training = 0
+        trainees_waiting = 0
+        trainees_bench = 0
+
         for trainee in trainees:
             if trainee.condition == "training":
                 trainees_training += 1
-        # show the number of trainees on the waiting list
-        trainees_waiting = 0
-        for trainee in trainees:
             if trainee.condition == "waiting list":
                 trainees_waiting += 1
+            if trainee.condition == "bench":
+                trainees_bench += 1
 
-        print(f"The number of open centres is: {open_centres}")
-        print(f"The number of full centres is: {full_centres}")
-        print(f"The number of trainees on training condition is: {trainees_training}")
-        print(f"The number of trainees on waiting list condition: {trainees_waiting}")
+        print(f"Open centres: {open_centres}")
+        print(f"Full centres: {full_centres}")
+        print(f"Closed centres: {closed_centres}")
+        print(f"Trainees on training condition: {trainees_training}")
+        print(f"Trainees on waiting list condition: {trainees_waiting}")
+        print(f"Trainees on bench condition: {trainees_bench}")
 
     num += 1
 
 if user_option == 2:
     # show the number of open centres
     open_centres = 0
+    full_centres = 0
+    closed_centres = 0
+
     for centre in centres:
         if centre.condition == "open":
             open_centres += 1
-    # show the number of full centres
-    full_centres = 0
-    for centre in centres:
         if centre.condition == "full":
             full_centres += 1
+        if centre.condition == "closed":
+            closed_centres += 1
+
     # show the number of trainees currently training
     trainees_training = 0
+    trainees_waiting = 0
+    trainees_bench = 0
+
     for trainee in trainees:
         if trainee.condition == "training":
             trainees_training += 1
-    # show the number of trainees on the waiting list
-    trainees_waiting = 0
-    for trainee in trainees:
         if trainee.condition == "waiting list":
             trainees_waiting += 1
+        if trainee.condition == "bench":
+            trainees_bench += 1
 
-    print(f"The number of open centres is: {open_centres}")
-    print(f"The number of full centres is: {full_centres}")
-    print(f"The number of trainees on training condition is: {trainees_training}")
-    print(f"The number of trainees on waiting list condition: {trainees_waiting}")
+    print(f"Open centres: {open_centres}")
+    print(f"Full centres: {full_centres}")
+    print(f"Closed centres: {closed_centres}")
+    print(f"Trainees on training condition: {trainees_training}")
+    print(f"Trainees on waiting list condition: {trainees_waiting}")
+    print(f"Trainees on bench condition: {trainees_bench}")
