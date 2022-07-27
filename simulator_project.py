@@ -284,7 +284,7 @@ while num <= user_months:
     num += 1
 
 if user_option == 2:
-    # show the number of open centres
+    # show the report on the console
     open_centres = 0
     full_centres = 0
     closed_centres = 0
@@ -313,6 +313,6 @@ if user_option == 2:
     print(f"Open centres: {open_centres}")
     print(f"Full centres: {full_centres}")
     print(f"Closed centres: {closed_centres}")
-    print(f"Trainees on training condition: {trainees_training}")
-    print(f"Trainees on waiting list condition: {trainees_waiting}")
-    print(f"Trainees on bench condition: {trainees_bench}")
+    print(f"Trainees currently training: {trainees_training}")
+    print(f"Trainees on the waiting list: {trainees_waiting}")
+    print(f"Trainees on the bench: {trainees_bench}")
