@@ -55,6 +55,33 @@ class Centre:
                             break
                 break
 
+    def check_trainees(self):
+        # 12) close bootcamps with less than 25 trainees for 3 months
+        if centre.kind == "Bootcamp" and centre.trainees < 25:
+            centre.close_BC += 1
+            if centre.close_BC == 4:
+                centre.condition = "closed"
+                # 14) move trainees to other centres
+                centre.move_trainees()
+        if centre.kind == "Bootcamp" and centre.trainees >= 25:
+            centre.close_BC = 0
+        # 13) close centres with less than 25 trainees
+        if (centre.kind == "Training Hub" or centre.kind == "Tech Centre") and centre.trainees < 25:
+            centre.condition = "closed"
+            # move trainees to waiting list
+            centre.move_trainees()
+
+    def move_trainees(self):
+        # 14) move trainees to waiting list
+        # iterate over the dictionary; list_trainees is a list containing the trainees studying in each course
+        for list_trainees in centre.course.values():
+            # iterate over the items in the list containing the trainees studying in each course
+            # t is each of the trainees
+            for trainee in list_trainees:
+                trainee.condition = "waiting list"
+                # remove the trainee from the list list_trainees
+                list_trainees.remove(trainee)
+
 
 class TrainingHub(Centre):
     def __init__(self, condition, month):
@@ -92,15 +119,13 @@ class TechCentre(Centre):
         self.trainees = 0
 
 
-num = 7
-if num % 2 == 0:
-    is_even = num
-else:
-    is_even = num + 1
+user_months = 36
+num = 1
 
-while num >= 0:
+while num <= user_months:
+
     # EVERY 2 MONTHS
-    if is_even % 2 == 0:
+    if num % 2 == 0:
         # 15) open 1 centre
         # check the number of Bootcamps: only 2 can ever exist
         if count_BC < 2:
@@ -120,6 +145,11 @@ while num >= 0:
                     # open a Tech Centre and assign a random course to the centre
                     course = random.choice(courses_list)
                     centres.append(TechCentre("open", num, course))
+            else:
+                # open a Tech Centre and assign a random course to the centre
+                course = random.choice(courses_list)
+                centres.append(TechCentre("open", num, course))
+
         else:
             # choose between Training Hub or Tech Centre
             center_type = random.choice(["Training Hub", "Tech Centre"])
@@ -165,11 +195,17 @@ while num >= 0:
     for centre in centres:
         # the trainees are distributed to the centres
         centre.distribute_trainees()
+        # 11) check for number of trainees for centre
+        # 12) close bootcamps with less than 25 trainees for 3 months
+        # 13) close centres with less than 25 trainees
+        centre.check_trainees()
+        # 14) move trainees to another centre
+        centre.move_trainees()
 
-    num -= 1
-    is_even -= 1
 
-results = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    num += 1
+
+results = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 for centre in centres:
     if centre.condition == "open":
@@ -236,6 +272,9 @@ for trainee in trainees:
             results[28] += 1
         elif trainee.course == "Business":
             results[29] += 1
+
+results[30] = len(centres)
+print(f"\nTotal centres: {results[30]}")
 
 print(f"\nOpen centres: {results[0]}")
 print(f"   Bootcamps: {results[1]}")
