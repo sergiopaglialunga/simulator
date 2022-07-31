@@ -148,6 +148,7 @@ class Clients:
         else:
             client.trainee_req *= num/12
 
+
 user_months = int(input(" Enter the number of months for the simulation:\n"))
 user_option = int(input(" For monthly results enter: 1\n For results at the end enter: 2 \n"))
 

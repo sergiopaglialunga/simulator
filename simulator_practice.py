@@ -2,6 +2,7 @@ import random
 
 trainees = []
 centres = []
+clients = []
 courses_list = ["Java", "C#", "Data", "DevOps", "Business"]
 count_TH = 0
 count_BC = 0
@@ -61,26 +62,27 @@ class Centre:
             centre.close_BC += 1
             if centre.close_BC == 4:
                 centre.condition = "closed"
-                # 14) move trainees to other centres
-                centre.move_trainees()
+                # move trainees to waiting list
+                for list_trainees in centre.course.values():
+                    # iterate over the items in the list containing the trainees studying in each course
+                    # t is each of the trainees
+                    for trainee in list_trainees:
+                        trainee.condition = "waiting list"
+                        # remove the trainee from the list list_trainees
+                    list_trainees.clear()
         if centre.kind == "Bootcamp" and centre.trainees >= 25:
             centre.close_BC = 0
         # 13) close centres with less than 25 trainees
         if (centre.kind == "Training Hub" or centre.kind == "Tech Centre") and centre.trainees < 25:
             centre.condition = "closed"
+            centre.trainees = 0
             # move trainees to waiting list
-            centre.move_trainees()
-
-    def move_trainees(self):
-        # 14) move trainees to waiting list
-        # iterate over the dictionary; list_trainees is a list containing the trainees studying in each course
-        for list_trainees in centre.course.values():
-            # iterate over the items in the list containing the trainees studying in each course
-            # t is each of the trainees
-            for trainee in list_trainees:
-                trainee.condition = "waiting list"
-                # remove the trainee from the list list_trainees
-                list_trainees.remove(trainee)
+            for list_trainees in centre.course.values():
+                # iterate over the items in the list containing the trainees studying in each course
+                for tr_item in list_trainees:
+                    tr_item.condition = "waiting list"
+                # remove the trainees from the list list_trainees
+                list_trainees.clear()
 
 
 class TrainingHub(Centre):
@@ -112,17 +114,60 @@ class TechCentre(Centre):
     def __init__(self, condition, month, course_key):
         self.condition = condition
         self.month = month
-        self.course = {course_key: []}
+        self.course = {course_key:[]}
         self.kind = "Tech Centre"
         self.course_name = course_key
         self.capacity = 200
         self.trainees = 0
 
 
-user_months = 36
+class Client:
+    def __init__(self, trainee_req, month, course):
+        self.trainee_req = trainee_req
+        self.trainee_new_req = trainee_req
+        self.month = month
+        self.course = course
+        self.trainees = []
+
+    def assign_trainees(self):
+        # check if the client needs trainees
+        if len(client.trainees) < client.trainee_new_req:
+            # calculate the number of trainees needed
+            trainees_needed = client.trainee_new_req - len(client.trainees)
+            # assign trainees to existing clients
+            for trainee in trainees:
+                if trainee.condition == "bench" and client.course == trainee.course:
+                    client.trainees.append(trainee)
+                    trainees_needed -= 1
+                if trainees_needed == 0:
+                    break
+
+    def unsatisfied_client(self):
+        if len(client.trainees) < client.trainee_new_req:
+            # move trainees to bench and delete client
+            for trainee in client.trainees:
+                trainee.condition = "bench"
+            clients.remove(client)
+        # reset the original value of trainees required for satisfied clients
+        else:
+            client.trainee_new_req = int(trainees_req * (num/client.month))
+
+user_months = 120
 num = 1
 
 while num <= user_months:
+
+    # EVERY 12 MONTHS
+    if num % 12 == 0:
+        # 5) delete unsatisfied clients (didn't fulfill requirement within a year)
+        for client in clients:
+            print(len(client.trainees),client.trainee_new_req)
+            client.unsatisfied_client()
+        # Create a new client
+        # Generate the trainees requirement between 15 and 30 (randrange is not inclusive)
+        trainees_req = random.randrange(15, 31)
+        course = random.choice(courses_list)
+        clients.append(Client(trainees_req, num, course))
 
     # EVERY 2 MONTHS
     if num % 2 == 0:
@@ -179,9 +224,11 @@ while num <= user_months:
             trainee.condition = "bench"
 
     # 3) assign trainees to existing clients
-    # for client in clients:
-    #     # check if the client needs trainees
-    #     client.assign_trainees()
+    for client in clients:
+        # check if the client needs trainees
+        client.assign_trainees()
+        for trainee in client.trainees:
+            trainee.condition = "client"
 
     # 6) create 50 to 100 new trainees
     num_trainees = random.randrange(50, 101)
@@ -199,13 +246,10 @@ while num <= user_months:
         # 12) close bootcamps with less than 25 trainees for 3 months
         # 13) close centres with less than 25 trainees
         centre.check_trainees()
-        # 14) move trainees to another centre
-        centre.move_trainees()
-
 
     num += 1
 
-results = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+results = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 for centre in centres:
     if centre.condition == "open":
@@ -248,7 +292,7 @@ for trainee in trainees:
             results[16] += 1
         elif trainee.course == "Business":
             results[17] += 1
-    if trainee.condition == "waiting list":
+    elif trainee.condition == "waiting list":
         results[18] += 1
         if trainee.course == "Java":
             results[19] += 1
@@ -260,7 +304,7 @@ for trainee in trainees:
             results[22] += 1
         elif trainee.course == "Business":
             results[23] += 1
-    if trainee.condition == "bench":
+    elif trainee.condition == "bench":
         results[24] += 1
         if trainee.course == "Java":
             results[25] += 1
@@ -272,37 +316,49 @@ for trainee in trainees:
             results[28] += 1
         elif trainee.course == "Business":
             results[29] += 1
+    elif trainee.condition == "client":
+        results[30] += 1
 
-results[30] = len(centres)
-print(f"\nTotal centres: {results[30]}")
-
+results[31] = len(centres)
+print(f"\nTotal centres: {results[31]}")
 print(f"\nOpen centres: {results[0]}")
 print(f"   Bootcamps: {results[1]}")
 print(f"   Training Hubs: {results[2]}")
 print(f"   Tech Centres: {results[3]}")
-
 print(f"Full centres: {results[4]}")
 print(f"   Bootcamps: {results[5]}")
 print(f"   Training Hubs: {results[6]}")
 print(f"   Tech Centres: {results[7]}")
-
 print(f"Closed centres: {results[8]}")
 print(f"   Bootcamps: {results[9]}")
 print(f"   Training Hubs: {results[10]}")
 print(f"   Tech Centres: {results[11]}")
 
-print(f"Trainees currently training: {results[12]}")
+results[32] = len(trainees)
+print(f"\nTotal trainees: {results[32]}")
+print(f"\nTrainees currently training: {results[12]}")
 for item in courses_list:
-    print(f"   {item}: {results[courses_list.index(item)+13]}")
+    print(f"   {item}: {results[courses_list.index(item) + 13]}")
 print(f"Trainees on the waiting list: {results[18]}")
 for item in courses_list:
-    print(f"   {item}: {results[courses_list.index(item)+19]}")
+    print(f"   {item}: {results[courses_list.index(item) + 19]}")
 print(f"Trainees on the bench: {results[24]}")
 for item in courses_list:
-    print(f"   {item}: {results[courses_list.index(item)+25]}")
+    print(f"   {item}: {results[courses_list.index(item) + 25]}")
+print(f"Trainees with a client: {results[30]}")
 print(" ------------------------------------------------")
 
-for centre in centres:
-    print(f"\nCentre number {centres.index(centre)+1}: {centre.kind} - Trainees: {centre.trainees}")
-    for course, trainees in centre.course.items():
-        print(f"   Course: {course} - Trainees: {len(trainees)}")
+# for centre in centres:
+#     print(
+#         f"\nCentre number {centres.index(centre) + 1}: {centre.kind} - Trainees: {centre.trainees} - {centre.condition} - {centre.month}")
+#     for course, trainees in centre.course.items():
+#         print(f"   Course: {course} - Trainees: {len(trainees)}")
+#         for trainee in trainees:
+#             if centre.condition == "closed":
+#                 print(trainee.condition)
+
+results[33] = len(clients)
+print(f"\nTotal clients: {results[33]}")
+for client in clients:
+    print(f"Client month: {client.month} - Trainees requirement: {client.trainee_new_req} - Trainees: {len(client.trainees)}")
+
