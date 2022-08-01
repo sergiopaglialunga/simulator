@@ -85,17 +85,15 @@ class Client:
             for trainee in trainees:
                 if trainee.condition == "bench" and client.course == trainee.course:
                     trainee.condition = "client"
+                    print("The client is taking a trainee",num, trainee,trainee.condition)
                     client.trainees.append(trainee)
                     trainees_needed -= 1
                 if trainees_needed == 0:
                     break
-            for trainee in client.trainees:
-                trainee.condition = "client"
 
     def unsatisfied_client(self):
-        print(client.month, len(client.trainees), client.trainee_new_req)
         if len(client.trainees) < client.trainee_new_req:
-            #
+            print("Delete centre")
             # move trainees to bench and delete client
             for trainee in client.trainees:
                 print(trainee.condition)
@@ -104,22 +102,23 @@ class Client:
             clients.remove(client)
         # reset the original value of trainees required for satisfied clients
         else:
-            client.trainee_new_req = int(trainees_req * (num/client.month))
+            client.trainee_new_req += client.trainee_req
 
 
-user_months = 26
+user_months = 24
 num = 1
 
 while num <= user_months:
-    # EVERY 12 MONTHS: create a client
-    # Delete unsatisfied clients (didn't fulfill requirement within a year)
-    # and restart the trainee requirement for satisfied clients
-    # for client in clients:
-    #     client.unsatisfied_client() # CLIENT 1
 
     if num % 12 == 0:
+        # Delete unsatisfied clients (didn't fulfill requirement within a year)
+        # and restart the trainee requirement for satisfied clients
+        for client in clients:
+            client.unsatisfied_client()
+
+        # EVERY 12 MONTHS: create a client
         course = random.choice(courses_list)
-        clients.append(Client(10, num, course))
+        clients.append(Client(1, num, course))
 
     # EVERY 2 MONTHS: create a centre
     if num % 2 == 0:
@@ -137,12 +136,12 @@ while num <= user_months:
 
     # 3) assign trainees to existing clients
     for client in clients:
-    #     # check if the client needs trainees
-        client.assign_trainees() # CLIENT 2
-        for trainee in client.trainees:
-            trainee.condition = "client"
+    # check if the client needs trainees
+        client.assign_trainees()
+        # for trainee in client.trainees:
+        #     trainee.condition = "client"
     # 6) create 50 to 100 new trainees
-    num_trainees = 10
+    num_trainees = 4
     while num_trainees > 0:
         # 7) random assignment of trainee to courses
         option = random.choice(courses_list)
@@ -172,6 +171,7 @@ for centre in centres:
         results[8] += 1
 
 for trainee in trainees:
+    print(trainee.condition,trainee)
     if trainee.condition == "training":
         results[12] += 1
     elif trainee.condition == "waiting list":
@@ -196,7 +196,10 @@ print(" ------------------------------------------------")
 results[32] = len(clients)
 print(f"Total clients: {results[32]}")
 for client in clients:
-    print(f"Client month: {client.month} - Trainees requirements: {client.trainee_req} - Trainees: {len(client.trainees)}")
+    print(f"Client month: {client.month} - Trainees requirements: {client.trainee_req, client.trainee_new_req} - Trainees: {len(client.trainees)}")
     for trainee in client.trainees:
-        print(trainee.condition)
+        print(trainee.condition,trainee)
 
+for item in trainees:
+    if trainees.count(item) > 1:
+        print(item)

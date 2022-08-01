@@ -144,15 +144,16 @@ class Client:
 
     def unsatisfied_client(self):
         if len(client.trainees) < client.trainee_new_req:
+            print("delete client")
             # move trainees to bench and delete client
             for trainee in client.trainees:
                 trainee.condition = "bench"
             clients.remove(client)
         # reset the original value of trainees required for satisfied clients
         else:
-            client.trainee_new_req = int(trainees_req * (num/client.month))
+            client.trainee_new_req += client.trainee_req
 
-user_months = 120
+user_months = 200
 num = 1
 
 while num <= user_months:
@@ -161,7 +162,6 @@ while num <= user_months:
     if num % 12 == 0:
         # 5) delete unsatisfied clients (didn't fulfill requirement within a year)
         for client in clients:
-            print(len(client.trainees),client.trainee_new_req)
             client.unsatisfied_client()
         # Create a new client
         # Generate the trainees requirement between 15 and 30 (randrange is not inclusive)
