@@ -7,6 +7,8 @@ courses_list = ["Java", "C#", "Data", "DevOps", "Business"]
 count_TH = 0
 count_BC = 0
 
+results = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
 
 class Trainee:
     def __init__(self, course, condition):
@@ -153,7 +155,10 @@ class Client:
         else:
             client.trainee_new_req += client.trainee_req
 
-user_months = 200
+
+user_months = int(input(" Enter the number of months for the simulation:\n"))
+user_option = int(input(" For monthly results enter: 1\n For results at the end enter: 2 \n"))
+
 num = 1
 
 while num <= user_months:
@@ -219,9 +224,9 @@ while num <= user_months:
     for trainee in trainees:
         if trainee.condition == "training":
             trainee.month += 1
-        # 2) after 12 months of training move trainees to bench
-        if trainee.month == 12:
-            trainee.condition = "bench"
+            # 2) after 12 months of training move trainees to bench
+            if trainee.month == 12:
+                trainee.condition = "bench"
 
     # 3) assign trainees to existing clients
     for client in clients:
@@ -247,118 +252,220 @@ while num <= user_months:
         # 13) close centres with less than 25 trainees
         centre.check_trainees()
 
+    if user_option == 1: # Output monthly results
+
+        for centre in centres:
+            if centre.condition == "open":
+                results[0] += 1
+                if centre.kind == "Bootcamp":
+                    results[1] += 1
+                elif centre.kind == "Training Hub":
+                    results[2] += 1
+                elif centre.kind == "Tech Centre":
+                    results[3] += 1
+
+            if centre.condition == "full":
+                results[4] += 1
+                if centre.kind == "Bootcamp":
+                    results[5] += 1
+                elif centre.kind == "Training Hub":
+                    results[6] += 1
+                elif centre.kind == "Tech Centre":
+                    results[7] += 1
+
+            if centre.condition == "closed":
+                results[8] += 1
+                if centre.kind == "Bootcamp":
+                    results[9] += 1
+                elif centre.kind == "Training Hub":
+                    results[10] += 1
+                elif centre.kind == "Tech Centre":
+                    results[11] += 1
+
+        for trainee in trainees:
+            if trainee.condition == "training":
+                results[12] += 1
+                if trainee.course == "Java":
+                    results[13] += 1
+                elif trainee.course == "C#":
+                    results[14] += 1
+                elif trainee.course == "Data":
+                    results[15] += 1
+                elif trainee.course == "DevOps":
+                    results[16] += 1
+                elif trainee.course == "Business":
+                    results[17] += 1
+            elif trainee.condition == "waiting list":
+                results[18] += 1
+                if trainee.course == "Java":
+                    results[19] += 1
+                elif trainee.course == "C#":
+                    results[20] += 1
+                elif trainee.course == "Data":
+                    results[21] += 1
+                elif trainee.course == "DevOps":
+                    results[22] += 1
+                elif trainee.course == "Business":
+                    results[23] += 1
+            elif trainee.condition == "bench":
+                results[24] += 1
+                if trainee.course == "Java":
+                    results[25] += 1
+                elif trainee.course == "C#":
+                    results[26] += 1
+                elif trainee.course == "Data":
+                    results[27] += 1
+                elif trainee.course == "DevOps":
+                    results[28] += 1
+                elif trainee.course == "Business":
+                    results[29] += 1
+            elif trainee.condition == "client":
+                results[30] += 1
+
+        results[31] = len(centres)
+        print("-------------------------")
+        print(f"Month number: {num}")
+        print(f"\nTotal centres: {results[31]}")
+        print(f"\nOpen centres: {results[0]}")
+        print(f"   Bootcamps: {results[1]}")
+        print(f"   Training Hubs: {results[2]}")
+        print(f"   Tech Centres: {results[3]}")
+        print(f"Full centres: {results[4]}")
+        print(f"   Bootcamps: {results[5]}")
+        print(f"   Training Hubs: {results[6]}")
+        print(f"   Tech Centres: {results[7]}")
+        print(f"Closed centres: {results[8]}")
+        print(f"   Bootcamps: {results[9]}")
+        print(f"   Training Hubs: {results[10]}")
+        print(f"   Tech Centres: {results[11]}")
+
+        results[32] = len(trainees)
+        print(f"\nTotal trainees: {results[32]}")
+        print(f"\nTrainees currently training: {results[12]}")
+        for item in courses_list:
+            print(f"   {item}: {results[courses_list.index(item) + 13]}")
+        print(f"Trainees on the waiting list: {results[18]}")
+        for item in courses_list:
+            print(f"   {item}: {results[courses_list.index(item) + 19]}")
+        print(f"Trainees on the bench: {results[24]}")
+        for item in courses_list:
+            print(f"   {item}: {results[courses_list.index(item) + 25]}")
+        print(f"Trainees with a client: {results[30]}")
+
+        results[33] = len(clients)
+        print(f"\nTotal clients: {results[33]}")
+
     num += 1
 
-results = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+if user_option == 2: # Show results at the end of the simulation
 
-for centre in centres:
-    if centre.condition == "open":
-        results[0] += 1
-        if centre.kind == "Bootcamp":
-            results[1] += 1
-        elif centre.kind == "Training Hub":
-            results[2] += 1
-        elif centre.kind == "Tech Centre":
-            results[3] += 1
+    for centre in centres:
+        if centre.condition == "open":
+            results[0] += 1
+            if centre.kind == "Bootcamp":
+                results[1] += 1
+            elif centre.kind == "Training Hub":
+                results[2] += 1
+            elif centre.kind == "Tech Centre":
+                results[3] += 1
 
-    if centre.condition == "full":
-        results[4] += 1
-        if centre.kind == "Bootcamp":
-            results[5] += 1
-        elif centre.kind == "Training Hub":
-            results[6] += 1
-        elif centre.kind == "Tech Centre":
-            results[7] += 1
+        if centre.condition == "full":
+            results[4] += 1
+            if centre.kind == "Bootcamp":
+                results[5] += 1
+            elif centre.kind == "Training Hub":
+                results[6] += 1
+            elif centre.kind == "Tech Centre":
+                results[7] += 1
 
-    if centre.condition == "closed":
-        results[8] += 1
-        if centre.kind == "Bootcamp":
-            results[9] += 1
-        elif centre.kind == "Training Hub":
-            results[10] += 1
-        elif centre.kind == "Tech Centre":
-            results[11] += 1
+        if centre.condition == "closed":
+            results[8] += 1
+            if centre.kind == "Bootcamp":
+                results[9] += 1
+            elif centre.kind == "Training Hub":
+                results[10] += 1
+            elif centre.kind == "Tech Centre":
+                results[11] += 1
 
-for trainee in trainees:
-    if trainee.condition == "training":
-        results[12] += 1
-        if trainee.course == "Java":
-            results[13] += 1
-        elif trainee.course == "C#":
-            results[14] += 1
-        elif trainee.course == "Data":
-            results[15] += 1
-        elif trainee.course == "DevOps":
-            results[16] += 1
-        elif trainee.course == "Business":
-            results[17] += 1
-    elif trainee.condition == "waiting list":
-        results[18] += 1
-        if trainee.course == "Java":
-            results[19] += 1
-        elif trainee.course == "C#":
-            results[20] += 1
-        elif trainee.course == "Data":
-            results[21] += 1
-        elif trainee.course == "DevOps":
-            results[22] += 1
-        elif trainee.course == "Business":
-            results[23] += 1
-    elif trainee.condition == "bench":
-        results[24] += 1
-        if trainee.course == "Java":
-            results[25] += 1
-        elif trainee.course == "C#":
-            results[26] += 1
-        elif trainee.course == "Data":
-            results[27] += 1
-        elif trainee.course == "DevOps":
-            results[28] += 1
-        elif trainee.course == "Business":
-            results[29] += 1
-    elif trainee.condition == "client":
-        results[30] += 1
+    for trainee in trainees:
+        if trainee.condition == "training":
+            results[12] += 1
+            if trainee.course == "Java":
+                results[13] += 1
+            elif trainee.course == "C#":
+                results[14] += 1
+            elif trainee.course == "Data":
+                results[15] += 1
+            elif trainee.course == "DevOps":
+                results[16] += 1
+            elif trainee.course == "Business":
+                results[17] += 1
+        elif trainee.condition == "waiting list":
+            results[18] += 1
+            if trainee.course == "Java":
+                results[19] += 1
+            elif trainee.course == "C#":
+                results[20] += 1
+            elif trainee.course == "Data":
+                results[21] += 1
+            elif trainee.course == "DevOps":
+                results[22] += 1
+            elif trainee.course == "Business":
+                results[23] += 1
+        elif trainee.condition == "bench":
+            results[24] += 1
+            if trainee.course == "Java":
+                results[25] += 1
+            elif trainee.course == "C#":
+                results[26] += 1
+            elif trainee.course == "Data":
+                results[27] += 1
+            elif trainee.course == "DevOps":
+                results[28] += 1
+            elif trainee.course == "Business":
+                results[29] += 1
+        elif trainee.condition == "client":
+            results[30] += 1
 
-results[31] = len(centres)
-print(f"\nTotal centres: {results[31]}")
-print(f"\nOpen centres: {results[0]}")
-print(f"   Bootcamps: {results[1]}")
-print(f"   Training Hubs: {results[2]}")
-print(f"   Tech Centres: {results[3]}")
-print(f"Full centres: {results[4]}")
-print(f"   Bootcamps: {results[5]}")
-print(f"   Training Hubs: {results[6]}")
-print(f"   Tech Centres: {results[7]}")
-print(f"Closed centres: {results[8]}")
-print(f"   Bootcamps: {results[9]}")
-print(f"   Training Hubs: {results[10]}")
-print(f"   Tech Centres: {results[11]}")
+    results[31] = len(centres)
+    print(f"\nTotal centres: {results[31]}")
+    print(f"\nOpen centres: {results[0]}")
+    print(f"   Bootcamps: {results[1]}")
+    print(f"   Training Hubs: {results[2]}")
+    print(f"   Tech Centres: {results[3]}")
+    print(f"Full centres: {results[4]}")
+    print(f"   Bootcamps: {results[5]}")
+    print(f"   Training Hubs: {results[6]}")
+    print(f"   Tech Centres: {results[7]}")
+    print(f"Closed centres: {results[8]}")
+    print(f"   Bootcamps: {results[9]}")
+    print(f"   Training Hubs: {results[10]}")
+    print(f"   Tech Centres: {results[11]}")
 
-results[32] = len(trainees)
-print(f"\nTotal trainees: {results[32]}")
-print(f"\nTrainees currently training: {results[12]}")
-for item in courses_list:
-    print(f"   {item}: {results[courses_list.index(item) + 13]}")
-print(f"Trainees on the waiting list: {results[18]}")
-for item in courses_list:
-    print(f"   {item}: {results[courses_list.index(item) + 19]}")
-print(f"Trainees on the bench: {results[24]}")
-for item in courses_list:
-    print(f"   {item}: {results[courses_list.index(item) + 25]}")
-print(f"Trainees with a client: {results[30]}")
-print(" ------------------------------------------------")
+    results[32] = len(trainees)
+    print(f"\nTotal trainees: {results[32]}")
+    print(f"\nTrainees currently training: {results[12]}")
+    for item in courses_list:
+        print(f"   {item}: {results[courses_list.index(item) + 13]}")
+    print(f"Trainees on the waiting list: {results[18]}")
+    for item in courses_list:
+        print(f"   {item}: {results[courses_list.index(item) + 19]}")
+    print(f"Trainees on the bench: {results[24]}")
+    for item in courses_list:
+        print(f"   {item}: {results[courses_list.index(item) + 25]}")
+    print(f"Trainees with a client: {results[30]}")
 
-# for centre in centres:
-#     print(
-#         f"\nCentre number {centres.index(centre) + 1}: {centre.kind} - Trainees: {centre.trainees} - {centre.condition} - {centre.month}")
-#     for course, trainees in centre.course.items():
-#         print(f"   Course: {course} - Trainees: {len(trainees)}")
-#         for trainee in trainees:
-#             if centre.condition == "closed":
-#                 print(trainee.condition)
+    # for centre in centres:
+    #     print(
+    #         f"\nCentre number {centres.index(centre) + 1}: {centre.kind} - Trainees: {centre.trainees} - {centre.condition} - {centre.month}")
+    #     for course, trainees in centre.course.items():
+    #         print(f"   Course: {course} - Trainees: {len(trainees)}")
+    #         for trainee in trainees:
+    #             if centre.condition == "closed":
+    #                 print(trainee.condition)
 
-results[33] = len(clients)
-print(f"\nTotal clients: {results[33]}")
-for client in clients:
-    print(f"Client month: {client.month} - Trainees requirement: {client.trainee_new_req} - Trainees: {len(client.trainees)}")
+    results[33] = len(clients)
+    print(f"\nTotal clients: {results[33]}")
+    # for client in clients:
+    #     print(f"Client month: {client.month} - Trainees requirement: {client.trainee_new_req} - Trainees: {len(client.trainees)}")
 

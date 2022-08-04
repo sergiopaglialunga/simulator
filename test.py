@@ -84,6 +84,7 @@ class Client:
             # assign trainees to existing clients
             for trainee in trainees:
                 if trainee.condition == "bench" and client.course == trainee.course:
+                    print(f"should be 'bench': {trainee.condition}")
                     trainee.condition = "client"
                     print("The client is taking a trainee",num, trainee,trainee.condition)
                     client.trainees.append(trainee)
@@ -131,8 +132,8 @@ while num <= user_months:
         if trainee.condition == "training":
             trainee.month += 1
         # 2) after 12 months of training move trainees to bench
-        if trainee.month == 12:
-            trainee.condition = "bench"
+            if trainee.month == 12:
+                trainee.condition = "bench"
 
     # 3) assign trainees to existing clients
     for client in clients:
